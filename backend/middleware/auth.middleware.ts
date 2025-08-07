@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/environment";
 import { logger } from "../utils/logger";
 
-export interface AuthRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     email: string;
@@ -14,7 +14,7 @@ export interface AuthRequest extends Request {
 
 // JWT AUTHENTICATION MIDDLEWARE
 export function authenticateToken(
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) {
@@ -44,7 +44,7 @@ export function authenticateToken(
 
 // ROLE BASED AUTHORIZATION MIDDLEWARE
 export function authorize(roles: string[]) {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: "Authenticated Required" });
     }
@@ -59,7 +59,7 @@ export function authorize(roles: string[]) {
 
 // MERCHANT OWNERSHIP MIDDLEWARE
 export function requireMerchantOwnership(
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) {
