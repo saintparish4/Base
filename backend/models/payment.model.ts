@@ -5,7 +5,6 @@ import {
   Transaction,
 } from "../types/payment.types";
 import { v4 as uuidv4 } from "uuid";
-import { logger } from "../utils/logger";
 
 export class PaymentModel {
   static async create(
@@ -87,6 +86,21 @@ export class PaymentModel {
     }
   }
 
+  static async countByMerchant(merchantId: string): Promise<number> {
+    const client = await dbPool.connect();
+
+    try {
+      const { rows } = await client.query(
+        `SELECT COUNT(*) as count FROM payments WHERE merchant_id = $1`,
+        [merchantId]
+      );
+
+      return parseInt(rows[0].count, 10);
+    } finally {
+      client.release();
+    }
+  }
+
   static async updateStatus(
     id: string,
     status: Payment["status"]
@@ -121,7 +135,7 @@ export class PaymentModel {
 
     try {
       const { rowCount } = await client.query(
-        "UPDATE payments SET qr_code = $1 WHERE id = $2",
+        "UPDATE payments SET qr_code_data = $1 WHERE id = $2",
         [qrCodeData, id]
       );
 
@@ -137,12 +151,30 @@ export class PaymentModel {
     try {
       const { rows } = await client.query(
         `SELECT * FROM payments 
-                WHERE status = 'pendning'
+                WHERE status = 'pending'
                 AND expires_at < CURRENT_TIMESTAMP`,
         []
       );
 
       return rows.map(this.mapRowToPayment);
+    } finally {
+      client.release();
+    }
+  }
+
+  static async markExpiredPayments(): Promise<number> {
+    const client = await dbPool.connect();
+
+    try {
+      const { rowCount } = await client.query(
+        `UPDATE payments 
+         SET status = 'expired'
+         WHERE status = 'pending'
+         AND expires_at < CURRENT_TIMESTAMP`,
+        []
+      );
+
+      return rowCount ?? 0;
     } finally {
       client.release();
     }

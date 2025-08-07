@@ -46,7 +46,7 @@ export function authenticateToken(
 export function authorize(roles: string[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ error: "Authenticated Required" });
+      return res.status(401).json({ error: "Authentication required" });
     }
 
     if (!roles.includes(req.user.role)) {
@@ -64,7 +64,7 @@ export function requireMerchantOwnership(
   next: NextFunction
 ) {
   if (!req.user) {
-    return res.status(401).json({ error: "Authentication Required" });
+    return res.status(401).json({ error: "Authentication required" });
   }
 
   const merchantId = req.params.merchantId || req.query.merchantId;

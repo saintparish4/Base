@@ -27,7 +27,7 @@ export class WebhookController {
       const { transactionHash, network, status } = req.body;
 
       if (!transactionHash || !network) {
-        return res.status(400).json({ error: "Missing fields required" });
+        return res.status(400).json({ error: "Missing required fields" });
       }
 
       // PROCESS THE TRANSACTION

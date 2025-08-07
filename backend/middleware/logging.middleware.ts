@@ -7,16 +7,16 @@ export interface RequestWithId extends Request {
 }
 
 export function loggingMiddleware(
-  req: RequestWithId,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
   const startTime = Date.now();
-  req.requestId = uuidv4();
+  (req as RequestWithId).requestId = uuidv4();
 
   // LOG REQUEST
   logger.info("Incoming request:", {
-    requestId: req.requestId,
+    requestId: (req as RequestWithId).requestId,
     method: req.method,
     url: req.url,
     ip: req.ip,
@@ -29,7 +29,7 @@ export function loggingMiddleware(
     const duration = Date.now() - startTime;
 
     logger.info("Request completed:", {
-      requestId: req.requestId,
+      requestId: (req as RequestWithId).requestId,
       method: req.method,
       url: req.url,
       status: res.statusCode,
@@ -46,7 +46,7 @@ export function auditLogger(action: string, resource: string) {
     res.on("finish", () => {
       if (res.statusCode < 400) {
         logger.info("Audit log:", {
-          requestId: req.requestId,
+          requestId: (req as RequestWithId).requestId,
           action,
           resource,
           userId: (req as any).user?.id,

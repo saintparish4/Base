@@ -148,15 +148,10 @@ export class PaymentController {
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = (page - 1) * limit;
 
-      const payments = await PaymentModel.findByMerchant(
-        req.user.merchantId,
-        limit,
-        offset
-      );
-
-      // GET TOTAL COUNT FOR PAGINATION
-      // TODO: IMPLEMENT COUNT QUERY IN PAYMENTMODEL
-      const totalCount = payments.length; // SIMPLIFIED FOR MVP
+      const [payments, totalCount] = await Promise.all([
+        PaymentModel.findByMerchant(req.user.merchantId, limit, offset),
+        PaymentModel.countByMerchant(req.user.merchantId),
+      ]);
 
       const response: ApiResponse = {
         success: true,

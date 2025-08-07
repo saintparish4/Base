@@ -56,7 +56,7 @@ export class WebhookService {
       logger.error("Webhook delivery failed:", {
         merchantId,
         event: payload.event,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
       await this.updateWebhookStatus(merchantId, payload.event, "failed");
       // TODO: IMPLEMENT RETRY LOGIC

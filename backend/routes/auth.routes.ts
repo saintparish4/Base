@@ -11,53 +11,56 @@ const authController = new AuthController();
 router.use(authRateLimit);
 
 // REGISTER MERCHANT
-router.post('/register', 
-    [
-        body('email').isEmail().normalizeEmail(),
-        body('password').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
-        body('businessName').isLength({ min: 2, max: 100 }).trim(),
-        body('contactPhone').optional().isMobilePhone('any'), 
-    ],
-    asyncHandler(authController.register.bind(authController))
+router.post(
+  "/register",
+  [
+    body("email").isEmail().normalizeEmail(),
+    body("password")
+      .isLength({ min: 8 })
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
+    body("businessName").isLength({ min: 2, max: 100 }).trim(),
+    body("contactPhone").optional().isMobilePhone("any"),
+  ],
+  asyncHandler(authController.register.bind(authController))
 );
 
 // LOGIN MERCHANT
-router.post('/login',
-    [
-        body('email').isEmail().normalizeEmail(),
-        body('password').notEmpty(), 
-    ],
-    asyncHandler(authController.login.bind(authController)) 
+router.post(
+  "/login",
+  [body("email").isEmail().normalizeEmail(), body("password").notEmpty()],
+  asyncHandler(authController.login.bind(authController))
 );
 
 // REFRESH TOKEN
-router.post('/refresh',
-    [
-        body('refreshToken').notEmpty(), 
-    ],
-    asyncHandler(authController.refreshToekn.bind(authController)) 
+router.post(
+  "/refresh",
+  [body("refreshToken").notEmpty()],
+  asyncHandler(authController.refreshToken.bind(authController))
 );
 
 // LOGOUT
-router.post('/logout',
-    asyncHandler(authController.logout.bind(authController))  
+router.post(
+  "/logout",
+  asyncHandler(authController.logout.bind(authController))
 );
 
 // REQUEST PASSWORD RESET
-router.post('/forgot-password',
-    [
-        body('email').isEmail().normalizeEmail(),  
-    ],
-    asyncHandler(authController.requestPasswordReset.bind(authController))  
+router.post(
+  "/forgot-password",
+  [body("email").isEmail().normalizeEmail()],
+  asyncHandler(authController.forgotPassword.bind(authController))
 );
 
 // RESET PASSWORD
-router.post('/reset-password',
-    [
-        body('token').notEmpty(),
-        body('newPassword').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/), 
-    ],
-    asyncHandler(authController.resetPassword.bind(authController))   
+router.post(
+  "/reset-password",
+  [
+    body("token").notEmpty(),
+    body("newPassword")
+      .isLength({ min: 8 })
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
+  ],
+  asyncHandler(authController.resetPassword.bind(authController))
 );
 
-export default router; 
+export default router;
